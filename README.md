@@ -8,8 +8,6 @@ Upload a **PDF/DOCX resume** and paste a **job description** to instantly get:
 **Live App:** https://ai-job-matcher-beige.vercel.app  
 **API Docs:** https://ai-job-matcher-kw97.onrender.com/docs
 
-> Built for hiring relevance: showcases ML/NLP, API engineering, and cloud deployment in a compact, production-style project.
-
 ---
 
 ## Features
@@ -38,12 +36,12 @@ Upload a **PDF/DOCX resume** and paste a **job description** to instantly get:
 
 ```
 
-\[Browser (Vercel)]  ── fetch ──►  \[FastAPI (Render)]
-React / Vite                       /api/match (file)
+\[Browser (Vercel)] ── fetch ──► \[FastAPI (Render)]
+React / Vite                        /api/match (file)
 /api/match\_text (raw text)
 /docs (OpenAPI)
 
-Scoring = 0.4 \* semantic(TF-IDF cosine) + 0.6 \* skills overlap
+Scoring = 0.4 \* semantic (TF-IDF cosine) + 0.6 \* skills overlap
 Optional LLM suggestions via OpenAI when detailed=true
 
 ```
@@ -74,6 +72,7 @@ vite.config.js
 package.json
 
 README.md
+LICENSE (MIT)
 
 ````
 
@@ -108,7 +107,7 @@ npm run dev
 
 ### Backend (Render)
 
-Required:
+**Required**
 
 ```
 OPENAI_API_KEY=sk-...              # needed for detailed suggestions
@@ -116,7 +115,7 @@ SUGGESTIONS_MODEL=gpt-4o-mini
 ALLOW_ORIGINS=https://ai-job-matcher-beige.vercel.app
 ```
 
-Optional (only if switching embeddings):
+**Optional (only if switching embeddings)**
 
 ```
 EMBED_MODE=tfidf                   # tfidf (default) | hf | openai
@@ -138,7 +137,7 @@ VITE_API_BASE=https://ai-job-matcher-kw97.onrender.com   # no trailing slash
 
 ### `POST /api/match_text`  (text only)
 
-Request
+**Request**
 
 ```json
 {
@@ -148,7 +147,7 @@ Request
 }
 ```
 
-Response (example)
+**Response (example)**
 
 ```json
 {
@@ -165,7 +164,7 @@ Response (example)
 
 ### `POST /api/match`  (multipart with resume file)
 
-Form fields:
+**Form fields**
 
 * `resume_file`: PDF or DOCX
 * `job_description`: string
@@ -237,6 +236,7 @@ python -m pytest -q
 * ⏭ GitHub Actions CI for tests and lint
 
 ---
+
 ## License
 
-MIT © Krishna Balaji
+[MIT](./LICENSE) © Krishna Balaji
