@@ -7,8 +7,11 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState(null);
-  const API_BASE = import.meta.env.VITE_API_BASE || ""; // e.g. "https://your-api.onrender.com"
 
+  // ---- API base (supports Render or local) ----
+  const RAW_API_BASE = import.meta.env.VITE_API_BASE || "";            // e.g., https://ai-job-matcher-kw97.onrender.com
+  const API_BASE = RAW_API_BASE.replace(/\/+$/, "");                    // strip trailing slash
+  const DOCS_URL = API_BASE ? `${API_BASE}/docs` : "http://localhost:8080/docs";
 
   const dropRef = useRef(null);
 
@@ -46,7 +49,7 @@ export default function App() {
 
     setLoading(true);
     try {
-      const resp = await fetch(`${API_BASE}/api/match`, { method: 'POST', body: fd })
+      const resp = await fetch(`${API_BASE}/api/match`, { method: "POST", body: fd });
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({}));
         throw new Error(err.detail || `Request failed (${resp.status})`);
@@ -101,7 +104,7 @@ Responsibilities include building REST APIs, integrating data stores, and deploy
         </div>
         <div className="nav__actions">
           <a
-            href="http://localhost:8080/docs"
+            href={DOCS_URL}
             target="_blank"
             rel="noreferrer"
             className="button button--ghost"
