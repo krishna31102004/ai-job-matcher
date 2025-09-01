@@ -7,18 +7,29 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # Run all commands from the backend folder so `from core...` works
+    defaults:
+      run:
+        working-directory: backend
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - name: Install backend deps
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: backend/requirements.txt
+
+      - name: Install deps
         run: |
-          cd backend
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+
       - name: Run tests
-        run: |
-          pytest -q
+        env:
+          PYTHONPATH: ${{ github.workspace }}/backend
+        run: pytest -q
