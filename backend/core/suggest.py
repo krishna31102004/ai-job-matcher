@@ -37,21 +37,26 @@ def generate_suggestions(resume_text: str, jd_text: str, missing_skills: List[st
     client = OpenAI(api_key=api_key)
     model = os.getenv("SUGGESTIONS_MODEL", "gpt-4o-mini")
 
+    # Tunable length for the cover letter
+    min_words = int(os.getenv("COVER_LETTER_MIN_WORDS", "180"))
+    max_words = int(os.getenv("COVER_LETTER_MAX_WORDS", "260"))
+
     system = (
-        "You are a concise career coach for software roles. "
+        "You are a precise career coach for software roles. "
         "Only use information present in the provided resume and job description. "
-        "Output ONE valid JSON object and nothing else. "
-        "JSON schema: {\"strengths\": string[], \"suggestions\": string[], \"cover_letter\": string}. "
-        "Constraints: "
-        "• strengths: up to 4 short bullets grounded strictly in the resume that align to the JD; "
+        "Return ONE valid JSON object and nothing else. "
+        'JSON schema: {"strengths": string[], "suggestions": string[], "cover_letter": string}. '
+        "Constraints:\n"
+        "• strengths: up to 4 short bullets grounded strictly in the resume that align to the JD; \n"
         "• suggestions: up to 4 concrete, resume-ready bullets the user can add NOW, each starting with a strong verb, "
-        "naming specific techs/scope/impact (numbers if available). "
-        "Do NOT propose courses, certifications, generic learning plans, or open-source contributions. "
-        "Do NOT invent skills or experience not present in the resume. "
-        "If the JD lists skills missing from the resume, suggest alignment actions ONLY if the resume already shows evidence; "
-        "otherwise omit that item from suggestions. "
-        "Cover letter: 4–5 sentences, grounded only in resume facts and JD needs; do not claim skills not in the resume; "
-        "no apologies, no filler."
+        "naming specific techs/scope/impact (numbers if available). No courses/certifications/generic learning plans. "
+        "Do not invent skills or experience not in the resume. If the JD lists skills missing from the resume, "
+        "suggest alignment actions only if the resume shows evidence; otherwise omit.\n"
+        f"• cover_letter: {min_words}-{max_words} words, 2–3 short paragraphs, include a greeting "
+        "(e.g., 'Dear Hiring Manager,'), a concise closer ('Sincerely,'), and a placeholder name if none is provided. "
+        "Use the job title and company only if explicitly present in the JD; otherwise say 'this role' and avoid naming. "
+        "Ground claims in resume facts (techs, scope, quantified impact) that match JD needs. "
+        "No apologies or filler; no extra keys; no code fences."
     )
 
     user = (
@@ -67,8 +72,8 @@ def generate_suggestions(resume_text: str, jd_text: str, missing_skills: List[st
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
-        temperature=0.1,
-        max_tokens=500,
+        temperature=0.2,
+        max_tokens=900,  # allow room for a full letter + lists
     )
 
     text = (resp.choices[0].message.content or "").strip()
