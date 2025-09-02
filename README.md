@@ -7,6 +7,7 @@ Upload a **PDF/DOCX resume** and paste a **job description** to instantly get:
 * optional **LLM suggestions** (resume-ready bullets + cover letter).
 
 **Live App:** [https://ai-job-matcher-beige.vercel.app](https://ai-job-matcher-beige.vercel.app)
+
 **API Docs:** [https://ai-job-matcher-kw97.onrender.com/docs](https://ai-job-matcher-kw97.onrender.com/docs)
 
 > Built for hiring relevance: showcases ML/NLP, API engineering, and cloud deployment in a compact, production-style project.
