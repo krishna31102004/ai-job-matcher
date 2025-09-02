@@ -1,49 +1,57 @@
 # AI Job Matcher
 
 Upload a **PDF/DOCX resume** and paste a **job description** to instantly get:
-- a **match score** (semantic + skills overlap),
-- **overlapping / missing skills**, and
-- optional **LLM suggestions** (resume-ready bullets + cover letter).
 
-**Live App:** https://ai-job-matcher-beige.vercel.app  
-**API Docs:** https://ai-job-matcher-kw97.onrender.com/docs
+* a **match score** (semantic + skills overlap),
+* **overlapping / missing skills**, and
+* optional **LLM suggestions** (resume-ready bullets + cover letter).
+
+**Live App:** [https://ai-job-matcher-beige.vercel.app](https://ai-job-matcher-beige.vercel.app)
+**API Docs:** [https://ai-job-matcher-kw97.onrender.com/docs](https://ai-job-matcher-kw97.onrender.com/docs)
+
+> Built for hiring relevance: showcases ML/NLP, API engineering, and cloud deployment in a compact, production-style project.
 
 ---
 
 ## Features
 
-- **Fast analysis**: TF-IDF semantic baseline + curated skills diff.
-- **Actionable output**: strengths, resume-ready improvement bullets, and an optional cover letter (when `detailed=true`).
-- **Switchable embeddings**: start with TF-IDF; swap to Sentence-Transformers or OpenAI with env toggles.
-- **Clean REST API** with OpenAPI/Swagger UI.
-- **Cloud-ready**: backend on **Render**, frontend on **Vercel**.
-- **Tests**: lightweight `pytest` coverage for core scoring & NLP.
+* **Fast analysis**: TF-IDF semantic baseline + curated skills diff.
+* **Actionable output**: strengths, resume-ready improvement bullets, and an optional cover letter (when `detailed=true`).
+* **Production-niceties in the UI**:
+
+  * file validation (PDF/DOCX, ≤ **5 MB**), clear errors
+  * **Analyze** button auto-disables until inputs are valid
+  * **Latency chip** (e.g., “Analyzed • 420 ms”)
+  * “**Download JSON**” of results
+  * API base indicator (local vs. Render)
+* **Switchable embeddings**: start with TF-IDF; swap to Sentence-Transformers or OpenAI with env toggles.
+* **Clean REST API** with OpenAPI/Swagger UI.
+* **Cloud-ready**: backend on **Render**, frontend on **Vercel**.
+* **Tests**: lightweight `pytest` for core scoring & NLP.
 
 ---
 
 ## Tech Stack
 
-- **Frontend**: React + Vite (fetch → REST), modern responsive UI.
-- **Backend**: FastAPI, Uvicorn.
-- **NLP**: TF-IDF baseline (scikit-learn), simple skills extractor (extensible).
-- **LLM (optional)**: OpenAI for suggestions & cover letter.
-- **Cloud**: Render (API) + Vercel (static frontend).
-- **Tests**: pytest.
+* **Frontend**: React + Vite (fetch → REST), modern responsive UI.
+* **Backend**: FastAPI, Uvicorn.
+* **NLP**: TF-IDF baseline (scikit-learn), simple skills extractor (extensible).
+* **LLM (optional)**: OpenAI for suggestions & cover letter.
+* **Cloud**: Render (API) + Vercel (static frontend).
+* **Tests**: pytest.
 
 ---
 
 ## Architecture (high-level)
 
 ```
+[Browser (Vercel)]  ── fetch ──►  [FastAPI (Render)]
+React / Vite                          /api/match (file)
+                                      /api/match_text (raw text)
+                                      /docs (OpenAPI)
 
-\[Browser (Vercel)] ── fetch ──► \[FastAPI (Render)]
-React / Vite                        /api/match (file)
-/api/match\_text (raw text)
-/docs (OpenAPI)
-
-Scoring = 0.4 \* semantic (TF-IDF cosine) + 0.6 \* skills overlap
+Scoring = 0.4 * semantic (TF-IDF cosine) + 0.6 * skills overlap
 Optional LLM suggestions via OpenAI when detailed=true
-
 ```
 
 ---
@@ -51,30 +59,28 @@ Optional LLM suggestions via OpenAI when detailed=true
 ## Project Structure
 
 ```
-
 backend/
-app.py                 # FastAPI app and routes
-core/
-embed.py             # tfidf | hf | openai backends
-match.py             # score + semantic & overlap calculations
-nlp.py               # skills extraction + synonyms
-parse.py             # PDF/DOCX → text
-suggest.py           # LLM suggestions (OpenAI)
-tests/
-test\_match.py        # unit tests
-requirements.txt
+  app.py                 # FastAPI app and routes
+  core/
+    embed.py             # tfidf | hf | openai backends
+    match.py             # score + semantic & overlap calculations
+    nlp.py               # skills extraction + synonyms
+    parse.py             # PDF/DOCX → text
+    suggest.py           # LLM suggestions (OpenAI)
+  tests/
+    test_match.py        # unit tests
+  requirements.txt
 
 frontend/
-src/
-App.jsx              # upload form + results UI
-main.jsx
-vite.config.js
-package.json
+  src/
+    App.jsx              # upload form + results UI
+    main.jsx
+  vite.config.js
+  package.json
 
 README.md
 LICENSE (MIT)
-
-````
+```
 
 ---
 
@@ -88,7 +94,7 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -r requirements.txt
 uvicorn app:app --reload
 # http://localhost:8000/docs
-````
+```
 
 ### 2) Frontend
 
@@ -96,7 +102,7 @@ uvicorn app:app --reload
 cd frontend
 npm i
 npm run dev
-# http://localhost:5173 (Vite proxies /api → http://localhost:8000)
+# http://localhost:5173  (Vite proxies /api → http://localhost:8000)
 ```
 
 ---
@@ -123,7 +129,7 @@ EMBED_MODEL_HF=sentence-transformers/all-MiniLM-L6-v2
 EMBED_MODEL_OPENAI=text-embedding-3-small
 ```
 
-> Do **not** set `PORT` on Render (it injects `$PORT` automatically).
+> Do **not** set `PORT` on Render (Render injects `$PORT` automatically).
 
 ### Frontend (Vercel)
 
@@ -166,7 +172,7 @@ VITE_API_BASE=https://ai-job-matcher-kw97.onrender.com   # no trailing slash
 
 **Form fields**
 
-* `resume_file`: PDF or DOCX
+* `resume_file`: PDF or DOCX (≤ 5 MB)
 * `job_description`: string
 * `detailed`: `true | false`
 
@@ -184,7 +190,7 @@ curl -X POST "$API/api/match" \
 
 ## How Scoring Works
 
-* **Semantic**: TF-IDF cosine between resume and JD (easy to swap for sentence embeddings).
+* **Semantic**: TF-IDF cosine between resume and JD (easy swap for sentence embeddings).
 * **Skills overlap**: intersection of extracted skills (see `core/nlp.py` synonyms list).
 * **Final score**: `0.4 * semantic + 0.6 * overlap` (tune in `core/match.py`).
 
